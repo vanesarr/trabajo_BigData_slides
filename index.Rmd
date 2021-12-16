@@ -1,6 +1,7 @@
 ---
 title: "Spotify en la actualidad y su espíritu navideño"
-author: "Alba Ibañez <br> Vanesa Regueiro <br> Aleixandra Blasco <br> UNIVERSIDAD DE VALENCIA" 
+subtitle: "Alba Ibañez, Vanesa Regueiro y Aleixandra Blasco <br> "
+author: "UNIVERSIDAD DE VALENCIA" 
 date: "Diciembre 2021"
 output: 
       ioslides_presentation:
@@ -76,6 +77,7 @@ dd <- rio::import(datos4)
 > - Géneros más populares.
 > - Artistas más populares.
 > - Espíritu navideño medido a través de Spotify.
+> - Conclusión.
 > - Bibliografía.
 
 ## 1. Introducción.
