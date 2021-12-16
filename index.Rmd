@@ -1,0 +1,498 @@
+---
+title: "Spotify en la actualidad y su espíritu navideño"
+author: "Alba Ibañez <br> Vanesa Regueiro <br> Aleixandra Blasco <br> UNIVERSIDAD DE VALENCIA" 
+date: "Diciembre 2021"
+output: 
+      ioslides_presentation:
+        background.color: "#EA2732"
+        logo: "./imagenes/logo.png" 
+---
+```{css, echo = FALSE}
+.columns {display:flex;}
+h1.title {font-size: 45px; color: #EA2732 }
+h1 {color: #EA2732 ; font-size: 35px ; font-family: Batang, Univers, sans-serif}
+h2{color: #EA2732 ; font-size: 55px}
+body { background-color: #EA2732}
+a {color: #EA2732}
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    z-index: 2;
+    color: #EA2732;
+    background-color: #EA2732;
+    border-color: palered}
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color:black;
+    background-color: #EA2732 }
+body{font-family: "Lucida Console", monospace;
+  font-size: 11pt}
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(rio)
+library(klippy)
+library(knitr)
+library(cowplot)
+library(corrplot)
+library(highcharter)
+library("GGally")  
+require(scales)
+library(ggplot2)
+library(gapminder)
+library(ggthemes)
+library(gganimate)
+library(plotly)
+library(dplyr)
+library(data.table)
+library(lubridate)
+library(scales)
+library(countrycode)
+```
+
+```{r dfs,  warning=FALSE, message=FALSE}
+datos1 <- here::here("datos", "charts.csv")
+
+aa <- rio::import(datos1) 
+
+datos2 <- here::here("datos", "regional.csv")
+
+bb <- rio::import(datos2) 
+
+datos3 <- here::here("datos", "top10s.csv")
+
+cc <- rio::import(datos3) 
+
+datos4 <- here::here("datos", "regional_mundial.csv")
+
+dd <- rio::import(datos4)
+```
+
+## ÍNDICE
+
+> - Introducción.
+> - Datos.
+> - ¿Qué es Spotify?
+> - Ánalisis de Canciones.
+> - Géneros más populares.
+> - Artistas más populares.
+> - Espíritu navideño medido a través de Spotify.
+> - Bibliografía.
+
+## 1. Introducción.
+Este trabajo consiste en un estudio de la plataforma de Spotify. Con este análisis se observarán distintas formas de examinar la popularidad de las canciones, así como los artistas más escuchados. 
+
+Atemperándonos a la época del año en la que estamos, se observará el espíritu navideño mundial. Por último, analizaremos las veces de reproducción de la canción más famosa de Mariah Carey en 2020. 
+
+Para hacer todo esto se pondrá en práctica lo estudiado en la asignatura de Programación y manejo de datos en la era del Big Data que se cursa en CUARTO de la carrera de Economía en la UV.
+
+## 2. 2. Datos
+
+Los datos que se van a utilizar durante el trabajo han sido sacados de **Kaggle** y **GitHub**, en la bibliografia se encuentra el link directo. Asimismo, se han descargado los datos semanales que proporciona **Spotify** a nivel mundial para analizar las tendencias de esta última semana.
+
+**LOS DATAFRAME**
+
+> - El primero llamado 'aa' tiene 9 columnas y 9.554 observaciones. 
+
+> - El segundo 'bb' tiene 5 columnas y 200 observaciones.
+
+> - El tercero 'cc' tiene 606 observaciones y 15 variables.
+
+> - Por último, el 'dd' tiene 200 observaciones y 5 variables.
+
+##      PAUSA PUBLICITARIA
+
+```{r, echo = FALSE, eval = TRUE, out.width = "100%", fig.align = "center"}
+knitr::include_graphics(here::here("imagenes", "foto3.jpeg") ) 
+```
+
+# 4. Análisis de canciones
+
+## 4. Análisis de canciones
+
+En este apartado analizamos las canciones comprendidas entre 2010-2019. A continuación, se procede a examinar las más populares, las más bailables y las que más duración tienen. Estas variables han sido extraídas desde la plataforma de Spotify. 
+
+```{r, echo = FALSE, eval = TRUE, out.width = "76%", fig.align = "center"}
+knitr::include_graphics(here::here("imagenes", "foto1.jpg") ) 
+```
+
+## 4. 1. Top 10 más Populares en Spotify
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+                      
+hpolar <- function(x, a, c, z) { 
+    
+highchart() %>% 
+  hc_chart(polar = TRUE) %>% 
+  hc_title(text = x) %>% 
+  hc_xAxis(categories = a,
+           tickmarkPlacement = "on",
+           lineWidth = 0) %>% 
+  hc_yAxis(gridLineInterpolation = "polygon",
+           lineWidth = 0,
+           min = 0) %>% 
+  hc_series(list(name = z,
+                 data = c,
+                 pointPlacement = "on",
+                 type = "column",
+                 color = '#a80828'))    }   
+```   
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+
+popularidad_cc <- cc %>%
+  select(title, pop, artist) %>%
+  slice_max(pop, n = 10)%>%
+  arrange(desc(pop))%>%
+  drop_na()
+
+hpolar('Popularidad - TOP 10 canciones', popularidad_cc$title, popularidad_cc$pop,  'popularidad')
+```
+
+## 4. 2. Top 10 con más Duración en Spotify
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+                      
+hpolar <- function(x, a, c, z) { 
+    
+highchart() %>% 
+  hc_chart(polar = TRUE) %>% 
+  hc_title(text = x) %>% 
+  hc_xAxis(categories = a,
+           tickmarkPlacement = "on",
+           lineWidth = 0) %>% 
+  hc_yAxis(gridLineInterpolation = "polygon",
+           lineWidth = 0,
+           min = 0) %>% 
+  hc_series(list(name = z,
+                 data = c,
+                 pointPlacement = "on",
+                 type = "column",
+                 color = '#a80828'))    }   
+```   
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+
+duracion_cc <- cc %>%
+  distinct(title, dur, artist) %>%
+  mutate(duracion_minutos = dur/60) %>%
+  slice_max(duracion_minutos, n = 10)%>%
+  arrange(desc(dur))
+    
+hpolar('Duracion - Top 10 canciones', duracion_cc$title, duracion_cc$duracion_minutos,  'duracion')
+```
+
+## 4. 3. Top 10 con más Bailabilidad en Spotify
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+                      
+hpolar <- function(x, a, c, z) { 
+    
+highchart() %>% 
+  hc_chart(polar = TRUE) %>% 
+  hc_title(text = x) %>% 
+  hc_xAxis(categories = a,
+           tickmarkPlacement = "on",
+           lineWidth = 0) %>% 
+  hc_yAxis(gridLineInterpolation = "polygon",
+           lineWidth = 0,
+           min = 0) %>% 
+  hc_series(list(name = z,
+                 data = c,
+                 pointPlacement = "on",
+                 type = "column",
+                 color = '#a80828'))    }   
+```
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+ 
+bailabilidad_cc <- cc %>%
+  distinct(title, dnce, artist) %>%
+  slice_max(dnce, n = 10) %>%
+  arrange(desc(dnce))
+  
+
+hpolar('Bailabilidad TOP 10 canciones', bailabilidad_cc$title, bailabilidad_cc$dnce,  'bailabilidad')
+```
+
+# 5. Géneros más populares.
+
+## 20 Géneros más populares.
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+topgenero_cca <- cc %>%
+  drop_na() %>%
+  group_by(top_genre) %>%
+  summarise(popularidad_total = median(pop)) %>%
+  slice_max(popularidad_total, n = 20) 
+
+topgenero_ccplota <- ggplot(topgenero_cca, aes(top_genre, y = (popularidad_total))) +
+  geom_bar(stat ="identity", width = 0.4, fill = rgb(0.1,0.3,0.5,0.7))  +
+  xlab("Género") +
+  ylab("Popularidad") +
+  labs(title = "Los 20 Géneros más populares") +
+  theme_light() +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+
+ggplotly(topgenero_ccplota)
+```
+
+# 6. Artistas más populares.
+##
+```{r, echo = FALSE, eval = TRUE, out.width = "100%", fig.align = "center"}
+knitr::include_graphics(here::here("imagenes", "foto5.jpg") ) 
+```
+
+## 6. 1. Evolución de los 5 artistas más populares año a año.
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+top_artistas_cc <- cc %>%
+  select(year, artist, pop, title, dur) %>%
+  group_by(year)%>%
+  filter(!is.na(year))%>%
+  filter(!is.na(artist))%>%
+  filter(!is.na(pop))%>%
+  filter(!is.na(title))%>%
+  filter(!is.na(dur))%>%
+  arrange(desc(pop))%>% 
+  ungroup()%>%
+  distinct(year, artist, pop, title, dur) %>%
+  group_by(year, artist, dur)  %>%
+  summarise(popularidad_suma = sum(pop)) %>%
+  ungroup() %>%
+  group_by(year) %>%
+  slice_max(popularidad_suma, n=5)
+  
+top_2017_ccplot <- ggplot(top_artistas_cc, aes(popularidad_suma, dur, colour = artist)) +
+  geom_point(alpha = 1/2) +
+  scale_size(range = c(4, 14)) +
+  scale_x_log10() +
+  theme(legend.position = 'none') +
+  labs(title = "Analisis popularidad artistas año tras año", subtitle = "No me creo que esto sepa hacerlo yo", caption = "Aprobamos, aprobamos", color = "País") +
+  facet_wrap(~year) +
+  ease_aes('linear')
+
+ggplotly(top_2017_ccplot)
+```
+
+## 6. 2. 1. 20 Artistas más populares (2017)
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+top_2017_cca <- cc %>%
+  select(year, artist, pop, title) %>%
+  group_by(year)%>%
+  filter(!is.na(year))%>%
+  filter(!is.na(artist))%>%
+  filter(!is.na(pop))%>%
+  filter(!is.na(title))%>%
+  filter(year == 2017)%>%
+  arrange(desc(pop))%>%
+  head(n=20)%>%
+  ungroup()
+
+top_2017_plota <- ggplot(top_2017_cca, aes(pop, color=artist)) +
+geom_bar(fill=NA) +
+coord_flip() 
+
+ggplotly(top_2017_plota)
+```
+
+## 6. 2. 2. 20 Artistas más populares (2018)
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+top_2018_cc <- cc %>%
+  select(year, artist, pop, title) %>%
+  group_by(year)%>%
+  filter(!is.na(year))%>%
+  filter(!is.na(artist))%>%
+  filter(!is.na(pop))%>%
+  filter(!is.na(title))%>%
+  filter(year == 2018)%>%
+  arrange(desc(pop))%>%
+  head(n=20)
+
+top_2018_plot <- ggplot(top_2018_cc, aes(pop, color=artist)) +
+geom_bar(fill=NA) +
+coord_flip() 
+ggplotly(top_2018_plot)
+```
+
+## 6. 2. 3. 20 Artistas más populares (2019)
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+top_2019_cc <- cc %>%
+  select(year, artist, pop, title) %>%
+  group_by(year)%>%
+  filter(!is.na(year))%>%
+  filter(!is.na(artist))%>%
+  filter(!is.na(pop))%>%
+  filter(!is.na(title))%>%
+  filter(year == 2019)%>%
+  arrange(desc(pop))%>%
+  head(n=20)
+
+top_2019_plot <- ggplot(top_2019_cc, aes(pop, color=artist)) +
+geom_bar(fill=NA) +
+coord_flip() 
+ggplotly(top_2019_plot)
+```
+
+# 7. Canciones más escuchadas la última semana.
+
+## 7. 1. La última Semana (ESPAÑA)
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+
+semana_canciones <- bb %>% 
+  slice_max(Streams, n = 50)
+
+semana_cancionesplot <- ggplot(semana_canciones, aes(x=Position, y=Streams, group=Artist, color=Track_Name)) +
+    geom_point() +
+  theme(legend.position = 'none') +
+  labs(title = "Canciones más escuchadas en la última semana en España", caption = "Elaboración propia")
+
+ggplotly(semana_cancionesplot)
+```
+
+## 7.2. La última Semana (MUNDIAL)
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+
+semana_cancionesmundo <- dd %>% 
+  slice_max(Streams, n = 50)
+  
+semana_cancionesplotmundo <- ggplot(semana_cancionesmundo, aes(x=Position, y=Streams, group=Artist, color=Track_Name)) +
+    geom_point() + 
+  theme(legend.position = 'none') +
+  labs(title = "Canciones más escuchadas en la última semana en el Mundo", caption = "Elaboración propia") 
+
+ggplotly(semana_cancionesplotmundo)
+```
+
+##
+```{r, echo = FALSE, eval = TRUE, out.width = "100%", fig.align = "center"}
+knitr::include_graphics(here::here("imagenes", "foto2.jpg") ) 
+```
+
+# 8. Espíritu navideño medido a través de Spotify.
+
+##
+```{r, echo = FALSE, eval = TRUE, out.width = "100%", fig.align = "center"}
+knitr::include_graphics(here::here("imagenes", "foto6.jpg") ) 
+```
+
+## 8. 1. Evolución reprod. 'All I Want For Christmas'.
+
+```{r, warning=FALSE}
+aa$year <- format(as.Date(aa$date, format="%Y/%m/%d"),"%Y")
+
+aa$month_day <- format(as.Date(aa$date, format="%Y/%m/%d"),"%m/%d")
+```
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE, out.width = "50%", fig.align = "center"}
+aa_mariah_carey <- aa %>%
+filter(title == "All I Want for Christmas Is You") %>%
+filter(region == "Global") %>%
+filter(chart == "top200") %>%
+filter(artist == "Mariah Carey") 
+  
+aa_plot <-  ggplot(aa_mariah_carey, aes(x = date, y = streams, color = "red")) +
+geom_line() + 
+labs(title = "Fecha repr. 'All I Want For Christmas'", caption = "global") + xlab("Fecha") + ylab("Nº de Reproducciones")  + theme_void() + theme(legend.position="none")
+
+ggplotly(aa_plot)
+```
+
+## 8. 2. Países con mayor espíritu navideño.
+Cuanto menor sea el rango, más pronto será la primera reproducción.
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+aa_mundo <- aa %>%
+filter(title == "All I Want for Christmas Is You") %>%
+filter(region != "Global") %>%
+filter(year == 2020) %>%
+filter(artist == "Mariah Carey") %>%
+filter(trend == "NEW_ENTRY") %>%
+filter(chart == "top200") %>%
+distinct(region, year, .keep_all = TRUE)
+```
+
+```{r, warning=FALSE}
+aa_mundo$code <- countrycode(aa_mundo$region, "country.name", "iso3c")
+
+aa_mundo$rank_entry <- rank(aa_mundo$date)
+```
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+aa_mundo_plot <- plot_ly(aa_mundo, 
+                         type='choropleth', 
+                         locations = aa_mundo$code, 
+                         z = as.numeric(aa_mundo$rank_entry), 
+                         text = aa_mundo$region) 
+
+ggplotly(aa_mundo_plot)
+```
+
+## 8. 3. 1. Los 5 Países con mayor espíritu navideño.
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+aa_espiritu_navid<- aa %>%
+filter(year == "2020") %>%
+filter(title == "All I Want for Christmas Is You") %>%
+filter(artist == "Mariah Carey") %>%
+filter(trend == "NEW_ENTRY") %>%
+filter(chart == "top200") %>%
+distinct(region, .keep_all = TRUE) %>%
+slice_min(order_by = date, n = 5) 
+
+aa_espiritu_plot <- ggplot(aa_espiritu_navid, aes(x = region, y = month_day), color = "region") +
+geom_bar(fill = "#EA2732", stat = "identity") +
+xlab("País") +
+ylab("Fecha de Reproducción") +
+ggtitle("Países con espíritu navideño temprano") +
+coord_flip() + theme_minimal() 
+
+ggplotly(aa_espiritu_plot)
+```
+
+## 8. 3. 2. Los 5 Países con menor espíritu navideño.
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, comment= FALSE}
+aa_espiritu_navida<- aa %>%
+filter(year == "2020") %>%
+filter(title == "All I Want for Christmas Is You") %>%
+filter(artist == "Mariah Carey") %>%
+filter(trend == "NEW_ENTRY") %>%
+filter(chart == "top200") %>%
+distinct(region, .keep_all = TRUE) %>%
+slice_max(order_by = date, n = 5) 
+
+aa_espiritu_plota <- ggplot(aa_espiritu_navida, aes(x = region, y = month_day), color = "region") +
+geom_bar(fill = "#EA2732", stat = "identity") +
+xlab("País") +
+ylab("Fecha de Reproducción") +
+ggtitle("Países con espíritu navideño tardío") +
+coord_flip() + theme_minimal() 
+
+ggplotly(aa_espiritu_plota)
+```
+
+## 9. Conclusiones
+
+Este trabajo, nos ha ayudado a asentar lo aprendido en la asignatura. Asimismo, muestra como cotidianamente las personas generan una infinidad de datos que permiten analizar tanto, comportamientos como datos para poder sacar conclusiones mundiales. 
+
+Como podéis observar, se ha intentado llevar a cabo un análisis casi-completo de esta plataforma de moda en la actualidad y mostrar mediante análisis realizados con R, información útil para los más aficionados a la música.
+
+## 10. Bibliografía
+
+> - [Página web de la asignatura.](https://perezp44.github.io/intro-ds-21-22-web/04-tutoriales.html)
+
+> - [Kaggle sobre Espirítu Navideño.](https://www.kaggle.com/ewoudb95/exploring-christmas-spirit-across-the-world/report)
+
+> - [Kaggle sobre datos Spotify.](https://www.kaggle.com/shadey/spotify-2010-2019/script)
+
+> - [Datos Spotify Semanales.](https://spotifycharts.com/regional)
+
+## ¡GRACIAS POR ESCUCHARNOS!
+**Feliz Navidad y suerte con los exámenes**
+<div class = "centered">
+![](./imagenes/foto7.gif)
+</div>
